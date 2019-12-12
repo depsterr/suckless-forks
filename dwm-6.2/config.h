@@ -40,10 +40,10 @@ static const int resizehints = 0.25;    /* 1 means respect size hints in tiled r
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "[M]",      monocle },
-	{ "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
+	{ "|M|",      centeredmaster },
+	{ "[]=",      tile },
+	{ "[M]",      monocle },
 	{ NULL,       NULL},
 };
 
