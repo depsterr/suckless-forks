@@ -14,7 +14,7 @@
  * set the override_redirect flag. Clients are organized in a linked client
  * list on each monitor, the focus history is remembered through a stack list
  * on each monitor. Each client contains a bit array to indicate the tags of a
- * client.
+  *client.
  *
  * Keys and tagging rules are organized as arrays and defined in config.h.
  *
@@ -1190,21 +1190,6 @@ maprequest(XEvent *e)
 }
 
 void
-monocle(Monitor *m)
-{
-	unsigned int n = 0;
-	Client *c;
-
-	for (c = m->clients; c; c = c->next)
-		if (ISVISIBLE(c))
-			n++;
-	if (n > 0) /* override layout symbol */
-		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
-	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
-		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
-}
-
-void
 motionnotify(XEvent *e)
 {
 	static Monitor *mon = NULL;
@@ -1465,6 +1450,7 @@ run(void)
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
+	runAutostart(); // autostart
 	while (running && !XNextEvent(dpy, &ev))
 		if (handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
@@ -1472,8 +1458,7 @@ run(void)
 
 void
 runAutostart(void) {
-	system("cd ~/.dwm; ./autostart_blocking.sh");
-	system("cd ~/.dwm; ./autostart.sh &");
+	system("~/.dwm/autostart.sh &");
 }
 
 void
@@ -1801,34 +1786,6 @@ tagmon(const Arg *arg)
 }
 
 void
-tile(Monitor *m)
-{
-	unsigned int i, n, h, r, g = 0, mw, my, ty;
-	Client *c;
-
-	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (n == 0)
-		return;
-
-	if (n > m->nmaster)
-		mw = m->nmaster ? (m->ww - (g = gappx)) * m->mfact : 0;
-	else
-		mw = m->ww;
-	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-		if (i < m->nmaster) {
-			r = MIN(n, m->nmaster) - i;
-			h = (m->wh - my - gappx * (r - 1)) / r;
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
-			my += HEIGHT(c) + gappx;
-		} else {
-			r = n - i;
-			h = (m->wh - ty - gappx * (r - 1)) / r;
-			resize(c, m->wx + mw + g, m->wy + ty, m->ww - mw - g - (2*c->bw), h - (2*c->bw), False);
-			ty += HEIGHT(c) + gappx;
-		}
-}
-
-void
 togglebar(const Arg *arg)
 {
 	selmon->showbar = !selmon->showbar;
@@ -1854,8 +1811,10 @@ togglefloating(const Arg *arg)
 void
 togglefullscr(const Arg *arg)
 {
-  if(selmon->sel)
-    setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
+	if(selmon->sel){
+		togglebar(0);
+		setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
+	}
 }
 
 void
@@ -2190,6 +2149,7 @@ view(const Arg *arg)
 {
 	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
 		return;
+
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (arg->ui & TAGMASK)
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
@@ -2295,7 +2255,6 @@ main(int argc, char *argv[])
 		die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
-	runAutostart();
 	run();
 	if(restart) execvp(argv[0], argv);
 	cleanup();
@@ -2304,9 +2263,37 @@ main(int argc, char *argv[])
 }
 
 void
+tile(Monitor *m)
+{
+	unsigned int i, n, h, r, g = 0, mw, my, ty;
+	Client *c;
+
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if (n == 0)
+		return;
+
+	if (n > m->nmaster)
+		mw = m->nmaster ? (m->ww - (g = gappx)) * m->mfact : 0;
+	else
+		mw = m->ww;
+	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+		if (i < m->nmaster) {
+			r = MIN(n, m->nmaster) - i;
+			h = (m->wh - my - gappx * (r - 1)) / r;
+			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+			my += HEIGHT(c) + gappx;
+		} else {
+			r = n - i;
+			h = (m->wh - ty - gappx * (r - 1)) / r;
+			resize(c, m->wx + mw + g, m->wy + ty, m->ww - mw - g - (2*c->bw), h - (2*c->bw), False);
+			ty += HEIGHT(c) + gappx;
+		}
+}
+
+void
 centeredmaster(Monitor *m)
 {
-	unsigned int i, n, h, mw, mx, my, oty, ety, tw;
+	unsigned int i, n, h, r, g = 0, mw, mx, my, oty, ety, tw;
 	Client *c;
 
 	/* count number of clients in the selected monitor */
@@ -2322,13 +2309,13 @@ centeredmaster(Monitor *m)
 
 	if (n > m->nmaster) {
 		/* go mfact box in the center if more than nmaster clients */
-		mw = m->nmaster ? m->ww * m->mfact : 0;
+		mw = m->nmaster ? (m->ww - (g = gappx)) * m->mfact : 0;
 		tw = m->ww - mw;
 
 		if (n - m->nmaster > 1) {
 			/* only one client */
-			mx = (m->ww - mw) / 2;
-			tw = (m->ww - mw) / 2;
+			mx = ((m->ww - mw) / 2);
+			tw = ((m->ww - mw) / 2);
 		}
 	}
 
@@ -2336,24 +2323,26 @@ centeredmaster(Monitor *m)
 	ety = 0;
 	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 	if (i < m->nmaster) {
+		r = MIN(n, m->nmaster) - i;
 		/* nmaster clients are stacked vertically, in the center
 		 * of the screen */
-		h = (m->wh - my) / (MIN(n, m->nmaster) - i);
+		h = (m->wh - my - gappx * (r - 1)) / (MIN(n, m->nmaster) - i);
 		resize(c, m->wx + mx, m->wy + my, mw - (2*c->bw),
 		       h - (2*c->bw), 0);
-		my += HEIGHT(c);
+		my += HEIGHT(c) + gappx;
 	} else {
+		r = MIN(n, m->nmaster) - i;
 		/* stack clients are stacked vertically */
 		if ((i - m->nmaster) % 2 ) {
-			h = (m->wh - ety) / ( (1 + n - i) / 2);
-			resize(c, m->wx, m->wy + ety, tw - (2*c->bw),
-			       h - (2*c->bw), 0);
-			ety += HEIGHT(c);
+			h = (m->wh - ety - gappx * (r - 1)) / ( (1 + n - i) / 2);
+			resize(c, m->wx, m->wy + ety, tw - (2*c->bw) - g,
+			       h - (2*c->bw), 0); // perhaps g should be removed here
+			ety += HEIGHT(c) + gappx;
 		} else {
-			h = (m->wh - oty) / ((1 + n - i) / 2);
-			resize(c, m->wx + mx + mw, m->wy + oty,
-			       tw - (2*c->bw), h - (2*c->bw), 0);
-			oty += HEIGHT(c);
+			h = (m->wh - oty - gappx * (r - 1)) / ((1 + n - i) / 2);
+			resize(c, m->wx + mx + mw + g, m->wy + oty,
+			       tw - g - (2*c->bw), h - (2*c->bw), 0);
+			oty += HEIGHT(c) + gappx;
 		}
 	}
 }
@@ -2361,7 +2350,7 @@ centeredmaster(Monitor *m)
 void
 centeredfloatingmaster(Monitor *m)
 {
-	unsigned int i, n, w, mh, mw, mx, mxo, my, myo, tx;
+	unsigned int i, n, w, r, g = 0, mh, mw, mx, mxo, my, myo, tx;
 	Client *c;
 
 	/* count number of clients in the selected monitor */
@@ -2370,24 +2359,15 @@ centeredfloatingmaster(Monitor *m)
 		return;
 
 	/* initialize nmaster area */
-	if (n > m->nmaster) {
-		/* go mfact box in the center if more than nmaster clients */
-		if (m->ww > m->wh) {
-			mw = m->nmaster ? m->ww * m->mfact : 0;
-			mh = m->nmaster ? m->wh * 0.9 : 0;
-		} else {
-			mh = m->nmaster ? m->wh * m->mfact : 0;
-			mw = m->nmaster ? m->ww * 0.9 : 0;
-		}
-		mx = mxo = (m->ww - mw) / 2;
-		my = myo = (m->wh - mh) / 2;
+	if (m->ww > m->wh) {
+		mw = m->nmaster ? (m->ww - (g = gappx)) * m->mfact : 0;
+		mh = m->nmaster ? m->wh * 0.9 : 0;
 	} else {
-		/* go fullscreen if all clients are in the master area */
-		mh = m->wh;
-		mw = m->ww;
-		mx = mxo = 0;
-		my = myo = 0;
+		mw = m->nmaster ? (m->ww - (g = gappx)) * m->mfact : 0;
+		mw = m->nmaster ? m->ww * 0.9 : 0;
 	}
+	mx = mxo = (m->ww - mw) / 2;
+	my = myo = (m->wh - mh) / 2;
 
 	for(i = tx = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 	if (i < m->nmaster) {
@@ -2396,12 +2376,28 @@ centeredfloatingmaster(Monitor *m)
 		w = (mw + mxo - mx) / (MIN(n, m->nmaster) - i);
 		resize(c, m->wx + mx, m->wy + my, w - (2*c->bw),
 		       mh - (2*c->bw), 0);
-		mx += WIDTH(c);
+		mx += WIDTH(c) + gappx;
 	} else {
 		/* stack clients are stacked horizontally */
 		w = (m->ww - tx) / (n - i);
 		resize(c, m->wx + tx, m->wy, w - (2*c->bw),
 		       m->wh - (2*c->bw), 0);
-		tx += WIDTH(c);
+		tx += WIDTH(c) + gappx;
 	}
 }
+
+void
+monocle(Monitor *m)
+{
+	unsigned int n = 0;
+	Client *c;
+
+	for (c = m->clients; c; c = c->next)
+		if (ISVISIBLE(c))
+			n++;
+	if (n > 0) /* override layout symbol */
+		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
+	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
+		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
+}
+
