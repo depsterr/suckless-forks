@@ -6,17 +6,19 @@
 
 * actualfullscreen
 
+* fakefullscreen (modified)
+
 * autoresize
 
-* autorestart
+* autorestart (modified)
 
 * awsomebar
 
-* centeredmaster
+* centeredmaster (modified)
 
 * cyclelayouts
 
-* gaps
+* gaps (extended)
 
 ### unique features
 
@@ -25,5 +27,7 @@
 * centered master floating has floating middle window even with just one window open
 
 * hides bar on fullscreen
+
+* starts all video in fake fullscreen and lets user specify fullscreen themselfs
 
 * floating layout removed (it's just in the way when scrolling)
