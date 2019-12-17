@@ -2351,7 +2351,7 @@ centeredmaster(Monitor *m)
 		if ((i - m->nmaster) % 2 ) {
 			h = (m->wh - ety - gappx * (r - 1)) / ( (1 + n - i) / 2);
 			resize(c, m->wx, m->wy + ety, tw - (2*c->bw) - g,
-			       h - (2*c->bw), 0); // perhaps g should be removed here
+			       h - (2*c->bw), 0);
 			ety += HEIGHT(c) + gappx;
 		} else {
 			h = (m->wh - oty - gappx * (r - 1)) / ((1 + n - i) / 2);
@@ -2384,20 +2384,22 @@ centeredfloatingmaster(Monitor *m)
 	mx = mxo = (m->ww - mw) / 2;
 	my = myo = (m->wh - mh) / 2;
 
-	for(i = tx = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-	if (i < m->nmaster) {
-		/* nmaster clients are stacked horizontally, in the center
-		 * of the screen */
-		w = (mw + mxo - mx) / (MIN(n, m->nmaster) - i);
-		resize(c, m->wx + mx, m->wy + my, w - (2*c->bw),
-		       mh - (2*c->bw), 0);
-		mx += WIDTH(c) + gappx;
-	} else {
-		/* stack clients are stacked horizontally */
-		w = (m->ww - tx) / (n - i);
-		resize(c, m->wx + tx, m->wy, w - (2*c->bw),
-		       m->wh - (2*c->bw), 0);
-		tx += WIDTH(c) + gappx;
+	tx = gappx;
+	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++){
+		if (i < m->nmaster) {
+			/* nmaster clients are stacked horizontally, in the center
+		 	* of the screen */
+			w = (mw + mxo - mx) / (MIN(n, m->nmaster) - i);
+			resize(c, m->wx + mx, m->wy + my, w - (2*c->bw),
+		       	mh - (2*c->bw), 0);
+			mx += WIDTH(c) + gappx;
+		} else {
+			/* stack clients are stacked horizontally */
+			w = (m->ww - tx - gappx) / (n - i);
+			resize(c, m->wx + tx, m->wy + gappx, w - (2*c->bw),
+		       	m->wh - (2*c->bw) - (2 * gappx), 0);
+			tx += WIDTH(c) + gappx;
+		}
 	}
 }
 
@@ -2415,4 +2417,3 @@ monocle(Monitor *m)
 	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
 }
-
