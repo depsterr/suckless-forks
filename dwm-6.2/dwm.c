@@ -284,6 +284,8 @@ static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 
+unsigned char fullscrpassthrough;
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -1558,10 +1560,10 @@ void
 setfullscreen(Client *c, int fullscreen)
 {
 	if (fullscreen) {
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
-		c->isfullscreen = 1;
-		if(!selmon->sel->fakefullscr){
+		if(!selmon->sel->fakefullscr && fullscrpassthrough){
+			XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+				PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+			c->isfullscreen = 1;
 			hidebarfunc((Arg*)NULL);
 			c->oldstate = c->isfloating;
 			c->oldbw = c->bw;
@@ -1571,10 +1573,10 @@ setfullscreen(Client *c, int fullscreen)
 			XRaiseWindow(dpy, c->win);
 		}
 	} else if (!fullscreen){
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)0, 0);
-		c->isfullscreen = 0;
-		if(!selmon->sel->fakefullscr){
+		if(!selmon->sel->fakefullscr && fullscrpassthrough){
+			XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+				PropModeReplace, (unsigned char*)0, 0);
+			c->isfullscreen = 0;
 			showbarfunc((Arg*)NULL);
 			c->isfloating = c->oldstate;
 			c->bw = c->oldbw;
@@ -1843,9 +1845,13 @@ togglefullscr(const Arg *arg)
 	if(selmon->sel){
 		if(selmon->sel->fakefullscr == 1){
 			selmon->sel->fakefullscr = 0;
+			fullscrpassthrough = 1;
 			setfullscreen(selmon->sel, 1);
+			fullscrpassthrough = 0;
 		}else{
+			fullscrpassthrough = 1;
 			setfullscreen(selmon->sel, 0);
+			fullscrpassthrough = 0;
 			selmon->sel->fakefullscr = 1;
 		}
 	}
