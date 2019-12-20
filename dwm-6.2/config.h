@@ -92,6 +92,17 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ Mod1Mask,						XK_Tab,    focuslastwindow,       {} },
+	{ Mod1Mask,						XK_1,      focuswindow,    {.i = 0 } },
+	{ Mod1Mask,						XK_2,      focuswindow,    {.i = 1 } },
+	{ Mod1Mask,						XK_3,      focuswindow,    {.i = 2 } },
+	{ Mod1Mask,						XK_4,      focuswindow,    {.i = 3 } },
+	{ Mod1Mask,						XK_5,      focuswindow,    {.i = 4 } },
+	{ Mod1Mask,						XK_6,      focuswindow,    {.i = 5 } },
+	{ Mod1Mask,						XK_7,      focuswindow,    {.i = 6 } },
+	{ Mod1Mask,						XK_8,      focuswindow,    {.i = 7 } },
+	{ Mod1Mask,						XK_9,      focuswindow,    {.i = 8 } },
+	{ Mod1Mask,						XK_0,      focuswindow,    {.i = 9 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -122,4 +133,3 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-
