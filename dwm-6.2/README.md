@@ -10,7 +10,7 @@
 
 * autorestart
 
-* autorun (modified to be able to launch X dependant applications, such as sxhkd)
+* autorun (modified to be able to launch X dependant applications, such as sxhkd and custom script location)
 
 * awsomebar
 
