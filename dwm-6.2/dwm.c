@@ -2408,6 +2408,8 @@ centeredmaster(Monitor *m)
 	}
 }
 
+// TODO: 
+
 void
 centeredfloatingmaster(Monitor *m)
 {

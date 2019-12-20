@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int gappx     = 8;        /* gap pixel between windows */
 static const unsigned int snap      = 8;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
@@ -96,17 +96,17 @@ static Key keys[] = {
 	{ GLOBALMODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ WINDOWMODKEY,						XK_Tab,    focuslastwindow,       {} },
-	{ WINDOWMODKEY,						XK_1,      focuswindow,    {.i = 0 } },
-	{ WINDOWMODKEY,						XK_2,      focuswindow,    {.i = 1 } },
-	{ WINDOWMODKEY,						XK_3,      focuswindow,    {.i = 2 } },
-	{ WINDOWMODKEY,						XK_4,      focuswindow,    {.i = 3 } },
-	{ WINDOWMODKEY,						XK_5,      focuswindow,    {.i = 4 } },
-	{ WINDOWMODKEY,						XK_6,      focuswindow,    {.i = 5 } },
-	{ WINDOWMODKEY,						XK_7,      focuswindow,    {.i = 6 } },
-	{ WINDOWMODKEY,						XK_8,      focuswindow,    {.i = 7 } },
-	{ WINDOWMODKEY,						XK_9,      focuswindow,    {.i = 8 } },
-	{ WINDOWMODKEY,						XK_0,      focuswindow,    {.i = 9 } },
+	{ WINDOWMODKEY,					      XK_Tab,    focuslastwindow,       {} },
+	{ WINDOWMODKEY|ControlMask,			  XK_1,      focuswindow,    {.i = 0 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_2,      focuswindow,    {.i = 1 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_3,      focuswindow,    {.i = 2 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_4,      focuswindow,    {.i = 3 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_5,      focuswindow,    {.i = 4 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_6,      focuswindow,    {.i = 5 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_7,      focuswindow,    {.i = 6 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_8,      focuswindow,    {.i = 7 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_9,      focuswindow,    {.i = 8 } },
+	{ WINDOWMODKEY|ControlMask,			  XK_0,      focuswindow,    {.i = 9 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
