@@ -1595,6 +1595,15 @@ setfullscreen(Client *c, int fullscreen)
 		c->isfloating = 1;
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
 		XRaiseWindow(dpy, c->win);
+
+		Client *c = selmon->clients;
+	
+		while(c){
+			if(!c->isfullscreen)
+				hide(c);
+			c = c->next;
+		}
+	
 	} else if (!fullscreen){
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)0, 0);
@@ -1608,6 +1617,13 @@ setfullscreen(Client *c, int fullscreen)
 		c->h = c->oldh;
 		resizeclient(c, c->x, c->y, c->w, c->h);
 		arrange(c->mon);
+
+		Client *c = selmon->clients;
+	
+		while(c){
+			show(c);
+			c = c->next;
+		}
 	}
 }
 
@@ -1862,7 +1878,6 @@ togglefloating(const Arg *arg)
 void
 togglefullscr(const Arg *arg)
 {
-	//setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
 	if(selmon->sel){
 		if(selmon->sel->isfullscreen)
 			setfullscreen(selmon->sel, 0);
