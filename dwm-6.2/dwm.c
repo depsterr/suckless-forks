@@ -1473,15 +1473,23 @@ run(void)
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
-	runAutostart(); // autostart
+	autostart(); // autostart
 	while (running && !XNextEvent(dpy, &ev))
 		if (handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
 }
 
 void
-runAutostart(void) {
-	system("~/.dwm/autostart.sh &");
+autostart(void) {
+	char command[1024] = "sh ";
+	short n;
+	for (n  = 3; autostartfilepath[n - 3] != 0x0; n++)
+		command[n] = autostartfilepath[n - 3];
+	command[n++] = ' ';
+	command[n++] = '&';
+	command[n] = 0x0;
+
+	system(command);
 }
 
 void
