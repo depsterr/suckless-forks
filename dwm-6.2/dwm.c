@@ -2225,12 +2225,31 @@ view(const Arg *arg)
 	focus(NULL);
 	arrange(selmon);
 	if(selmon->sel){
-		if(selmon->sel->isfullscreen)
+		if(selmon->sel->isfullscreen){
 			hidebarfunc((Arg*)NULL);
-		else
+			Client *c = selmon->clients;
+		
+			while(c){
+				if(!c->isfullscreen)
+					hide(c);
+				c = c->next;
+			}
+		}else{
 			showbarfunc((Arg*)NULL);
-	}else
+			Client *c = selmon->clients;
+			while(c){
+				show(c);
+				c = c->next;
+			}
+		}
+	}else{
 		showbarfunc((Arg*)NULL);
+		Client *c = selmon->clients;
+		while(c){
+			show(c);
+			c = c->next;
+		}
+	}
 }
 
 Client *
