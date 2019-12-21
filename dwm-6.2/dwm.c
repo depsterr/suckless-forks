@@ -1481,10 +1481,10 @@ run(void)
 
 void
 autostart(void) {
-	char command[1024] = "sh ";
+	char command[1024] = "bash ";
 	short n;
-	for (n  = 3; autostartfilepath[n - 3] != 0x0; n++)
-		command[n] = autostartfilepath[n - 3];
+	for (n  = 5; autostartfilepath[n - 5] != 0x0; n++)
+		command[n] = autostartfilepath[n - 5];
 	command[n++] = ' ';
 	command[n++] = '&';
 	command[n] = 0x0;
@@ -1945,6 +1945,15 @@ unmanage(Client *c, int destroyed)
 {
 	Monitor *m = c->mon;
 	XWindowChanges wc;
+
+	if(c->isfullscreen){
+		Client *cc = m->clients;
+		while(cc){
+			show(cc);
+			cc = cc->next;
+		}
+		showbarfunc((Arg*)NULL);
+	}
 
 	detach(c);
 	detachstack(c);
