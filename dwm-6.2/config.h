@@ -52,7 +52,7 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define GLOBALMODKEY Mod4Mask
-#define WINDOWMODKEY Mod1Mask
+#define WINDOWMODKEY Mod1Mask // not currently used
 #define TAGKEYS(KEY,TAG) \
 	{ GLOBALMODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ GLOBALMODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -72,6 +72,8 @@ static Key keys[] = {
 	{ GLOBALMODKEY,                       XK_b,      togglebar,      {} },
 	{ GLOBALMODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ GLOBALMODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	{ GLOBALMODKEY|ShiftMask,             XK_j,      focusmon,     {.i = +1 } },
+	{ GLOBALMODKEY|ShiftMask,             XK_k,      focusmon,     {.i = -1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = +1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_d,      incnmaster,     {.i = -1 } },
 	{ GLOBALMODKEY,                       XK_h,      setmfact,       {.f = -0.01} },
