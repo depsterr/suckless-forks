@@ -203,6 +203,7 @@ static void run(void);
 static void runAutostart(void);
 static void scan(void);
 static int sendevent(Client *c, Atom proto);
+static void movemon(const Arg *arg);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
@@ -1516,6 +1517,21 @@ scan(void)
 		}
 		if (wins)
 			XFree(wins);
+	}
+}
+
+void
+movemon(const Arg *arg)
+{
+	if(arg.i > 0)
+		sendmon(selmon->sel, selmon->next);
+	else{
+		struct Monitor m = selmon;
+		while(m->next != selmon && m)
+			m = m->next;
+		if(!m)
+			m = mons;
+		sendmon(selmon->sel, m);
 	}
 }
 
