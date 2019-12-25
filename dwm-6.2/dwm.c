@@ -1523,10 +1523,10 @@ scan(void)
 void
 movemon(const Arg *arg)
 {
-	if(arg.i > 0)
+	if(arg->i > 0)
 		sendmon(selmon->sel, selmon->next);
 	else{
-		struct Monitor m = selmon;
+		struct Monitor *m = selmon;
 		while(m->next != selmon && m)
 			m = m->next;
 		if(!m)
