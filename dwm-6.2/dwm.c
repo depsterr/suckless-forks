@@ -1527,10 +1527,9 @@ movemon(const Arg *arg)
 		sendmon(selmon->sel, selmon->next);
 	else{
 		struct Monitor *m = selmon;
-		while(m->next != selmon && m)
+		while(m->next != selmon){
 			m = m->next;
-		if(!m)
-			m = mons;
+		}
 		sendmon(selmon->sel, m);
 	}
 }
