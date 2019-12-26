@@ -116,6 +116,13 @@ static const char *colorname[] = {
 	"#add8e6", /* 258 -> cursor */
 };
 
+/* Colors used for selection */
+unsigned int selectionbg = 5;
+unsigned int selectionfg = 1;
+/* If 0 use selectionfg as foreground in order to have a uniform foreground-color */
+/* Else if 1 keep original foreground-color of each cell => more colors :) */
+static int ignoreselfg = 0;
+
 
 /*
  * Default colors (colorname index)
