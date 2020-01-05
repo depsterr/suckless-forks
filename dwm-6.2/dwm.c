@@ -1611,12 +1611,12 @@ setfullscreen(Client *c, int fullscreen)
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
 		XRaiseWindow(dpy, c->win);
 
-		Client *c = selmon->clients;
+		Client *cc = selmon->clients;
 	
-		while(c){
-			if(!c->isfullscreen)
-				hide(c);
-			c = c->next;
+		while(cc){
+			if(!cc->isfullscreen)
+				hide(cc);
+			cc = cc->next;
 		}
 	
 	} else if (!fullscreen){
@@ -1633,11 +1633,11 @@ setfullscreen(Client *c, int fullscreen)
 		resizeclient(c, c->x, c->y, c->w, c->h);
 		arrange(c->mon);
 
-		Client *c = selmon->clients;
+		Client *cc = selmon->clients;
 	
-		while(c){
-			show(c);
-			c = c->next;
+		while(cc){
+			show(cc);
+			cc = cc->next;
 		}
 	}
 }
@@ -1835,6 +1835,17 @@ void
 tag(const Arg *arg)
 {
 	if (selmon->sel && arg->ui & TAGMASK) {
+		if (selmon->sel->isfullscreen){
+
+			showbarfunc((Arg*)NULL);
+
+			Client *cc = selmon->clients;
+	
+			while(cc){
+				show(cc);
+				cc = cc->next;
+			}
+		}
 		selmon->sel->tags = arg->ui & TAGMASK;
 		focus(NULL);
 		arrange(selmon);
@@ -2212,8 +2223,6 @@ updatewindowtype(Client *c)
 	Atom state = getatomprop(c, netatom[NetWMState]);
 	Atom wtype = getatomprop(c, netatom[NetWMWindowType]);
 
-	if (state == netatom[NetWMFullscreen])
-		setfullscreen(c, 1);
 	if (wtype == netatom[NetWMWindowTypeDialog])
 		c->isfloating = 1;
 }
