@@ -200,14 +200,14 @@ static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
-static void runAutostart(void);
+static void autostart(void);
 static void scan(void);
 static int sendevent(Client *c, Atom proto);
 static void movemon(const Arg *arg);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
-static void setfullscreen(Client *c, int fullscreen);
+static void setfullscreen(Client *c, int fullscreen, int showhide);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
@@ -222,8 +222,8 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
-static void hidebarfunc(const Arg *arg);
-static void showbarfunc(const Arg *arg);
+static void hidebarfunc(Monitor *m);
+static void showbarfunc(Monitor *m);
 static void togglefloating(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -1597,13 +1597,13 @@ setfocus(Client *c)
 }
 
 void
-setfullscreen(Client *c, int fullscreen)
+setfullscreen(Client *c, int fullscreen, int showhide)
 {
 	if (fullscreen) {
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
 		c->isfullscreen = 1;
-		hidebarfunc((Arg*)NULL);
+		hidebarfunc(c->mon);
 		c->oldstate = c->isfloating;
 		c->oldbw = c->bw;
 		c->bw = 0;
@@ -1611,19 +1611,21 @@ setfullscreen(Client *c, int fullscreen)
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
 		XRaiseWindow(dpy, c->win);
 
-		Client *cc = selmon->clients;
-	
-		while(cc){
-			if(!cc->isfullscreen)
-				hide(cc);
-			cc = cc->next;
+		if (showhide){
+			Client *cc = c->mon->clients;
+		
+			while(cc){
+				if(!cc->isfullscreen)
+					hide(cc);
+				cc = cc->next;
+			}
 		}
 	
 	} else if (!fullscreen){
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)0, 0);
 		c->isfullscreen = 0;
-		showbarfunc((Arg*)NULL);
+		showbarfunc(c->mon);
 		c->isfloating = c->oldstate;
 		c->bw = c->oldbw;
 		c->x = c->oldx;
@@ -1633,11 +1635,13 @@ setfullscreen(Client *c, int fullscreen)
 		resizeclient(c, c->x, c->y, c->w, c->h);
 		arrange(c->mon);
 
-		Client *cc = selmon->clients;
-	
-		while(cc){
-			show(cc);
-			cc = cc->next;
+		if (showhide){
+			Client *cc = c->mon->clients;
+		
+			while(cc){
+				show(cc);
+				cc = cc->next;
+			}
 		}
 	}
 }
@@ -1837,7 +1841,7 @@ tag(const Arg *arg)
 	if (selmon->sel && arg->ui & TAGMASK) {
 		if (selmon->sel->isfullscreen){
 
-			showbarfunc((Arg*)NULL);
+			showbarfunc(selmon);
 
 			Client *cc = selmon->clients;
 	
@@ -1857,7 +1861,13 @@ tagmon(const Arg *arg)
 {
 	if (!selmon->sel || !mons->next)
 		return;
-	sendmon(selmon->sel, dirtomon(arg->i));
+	if (selmon->sel->isfullscreen){
+		Client *c = selmon->sel;
+		setfullscreen(c, 0, 1);
+		sendmon(selmon->sel, dirtomon(arg->i));
+		setfullscreen(c, 1, 0);
+	} else
+		sendmon(selmon->sel, dirtomon(arg->i));
 }
 
 void
@@ -1870,21 +1880,21 @@ togglebar(const Arg *arg)
 }
 
 void
-hidebarfunc(const Arg *arg)
+hidebarfunc(Monitor *m)
 {
-	selmon->showbar = 0;
-	updatebarpos(selmon);
-	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
-	arrange(selmon);
+	m->showbar = 0;
+	updatebarpos(m);
+	XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+	arrange(m);
 }
 
 void
-showbarfunc(const Arg *arg)
+showbarfunc(Monitor *m)
 {
-	selmon->showbar = 1;
-	updatebarpos(selmon);
-	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
-	arrange(selmon);
+	m->showbar = 1;
+	updatebarpos(m);
+	XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+	arrange(m);
 }
 
 void
@@ -1906,9 +1916,9 @@ togglefullscr(const Arg *arg)
 {
 	if(selmon->sel){
 		if(selmon->sel->isfullscreen)
-			setfullscreen(selmon->sel, 0);
+			setfullscreen(selmon->sel, 0, 1);
 		else
-			setfullscreen(selmon->sel, 1);
+			setfullscreen(selmon->sel, 1, 1);
 	}
 }
 
@@ -1978,7 +1988,7 @@ unmanage(Client *c, int destroyed)
 			show(cc);
 			cc = cc->next;
 		}
-		showbarfunc((Arg*)NULL);
+		showbarfunc(c->mon);
 	}
 
 	detach(c);
@@ -2259,7 +2269,7 @@ view(const Arg *arg)
 	arrange(selmon);
 	if(selmon->sel){
 		if(selmon->sel->isfullscreen){
-			hidebarfunc((Arg*)NULL);
+			hidebarfunc(selmon);
 			Client *c = selmon->clients;
 		
 			while(c){
@@ -2268,7 +2278,7 @@ view(const Arg *arg)
 				c = c->next;
 			}
 		}else{
-			showbarfunc((Arg*)NULL);
+			showbarfunc(selmon);
 			Client *c = selmon->clients;
 			while(c){
 				show(c);
@@ -2276,7 +2286,7 @@ view(const Arg *arg)
 			}
 		}
 	}else{
-		showbarfunc((Arg*)NULL);
+		showbarfunc(selmon);
 		Client *c = selmon->clients;
 		while(c){
 			show(c);
