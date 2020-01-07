@@ -33,3 +33,5 @@
 * floating layout removed (it's just in the way when scrolling)
 
 * focus windows with alt + number as well as latest window with alt + tab
+
+* selected monitor has (sel) in the status bar
