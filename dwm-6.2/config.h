@@ -21,6 +21,9 @@ static const char *colors[][3]      = {
 	[SchemeHid]  = { col_pink,  col_gray4, col_pink  },
 };
 
+/* uncomment for status on all monitors */
+//#define MULTIPLEMON
+
 /* autostart */
 static const char autostartfilepath[] = "~/.dwm/autostart.sh";
 
