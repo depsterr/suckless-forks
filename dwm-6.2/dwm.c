@@ -755,11 +755,11 @@ drawbar(Monitor *m)
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		sw = TEXTW(sstext) - lrpad + 2; /* 2px padding */
-		drw_text(drw, m->ww - sw + 4, 0, sw, bh, 0, sstext, 0); /* 4px padding */
+		drw_text(drw, m->ww - sw, 0, sw, bh, 0, sstext, 0);
 	} else {
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		sw = TEXTW(stext) - lrpad + 2; /* 2px padding */
-		drw_text(drw, m->ww - sw + 4, 0, sw, bh, 0, stext, 0); /* 4px padding */
+		drw_text(drw, m->ww - sw, 0, sw, bh, 0, stext, 0); /* 4px padding */
 	}
 
 	for (c = m->clients; c; c = c->next) {
