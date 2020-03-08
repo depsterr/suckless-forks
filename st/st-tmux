@@ -1,10 +1,6 @@
 #!/bin/sh
 
-echo $@
-
 ARGS="$@ -e /usr/bin/tmux"
-
-echo $ARGS
 
 for arg in "$@"; do
 	case "$arg" in
@@ -14,4 +10,5 @@ for arg in "$@"; do
 	esac
 done
 
+echo "Running: 'st-bin $ARGS'"
 st-bin $ARGS
