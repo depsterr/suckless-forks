@@ -1,0 +1,17 @@
+#!/bin/sh
+
+echo $@
+
+ARGS="$@ -e /usr/bin/tmux"
+
+echo $ARGS
+
+for arg in "$@"; do
+	case "$arg" in
+		-*e*)
+			ARGS="$@"
+			;;
+	esac
+done
+
+st-bin $ARGS

@@ -749,7 +749,7 @@ drawbar(Monitor *m)
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 #ifdef MULTIPLEMON
-	char sstext[256] = "(sel) ";
+	char sstext[256] = " (sel) ";
 	strcat(sstext, stext);
 #endif
 

@@ -4,16 +4,12 @@
 
 ### patches
 
-* alpha setting
+* change selection color
 
-* keyboard select (with my own keybinds)
+* custom alpha
 
-* scrollback
+### custom features
 
-* custom selection colors
+* no bold text
 
-* ability to disable bold or italic fonts
-
-### unique features
-
-* vi like keybinds for keyboard select mode
+* runs with tmux

@@ -226,9 +226,6 @@ typedef struct {
 /* Fontcache is an array now. A new font will be appended to the array. */
 static Fontcache frc[16];
 static int frclen = 0;
-extern int disablebold;
-extern int disableitalic;
-extern int disableroman;
 static char *usedfont = NULL;
 static double usedfontsize = 0;
 static double defaultfontsize = 0;
@@ -244,6 +241,11 @@ static char *opt_name  = NULL;
 static char *opt_title = NULL;
 
 static int oldbutton = 3; /* button event on startup: 3 = release */
+
+/* declared in config.h */
+extern int disablebold;
+extern int disableitalic;
+extern int disableroman;
 
 void
 clipcopy(const Arg *dummy)
@@ -414,7 +416,6 @@ bpress(XEvent *e)
 {
 	struct timespec now;
 	MouseShortcut *ms;
-	MouseKey *mk;
 	int snap;
 
 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
@@ -422,24 +423,13 @@ bpress(XEvent *e)
 		return;
 	}
 
-	if (tisaltscr()) {
-		for (ms = mshortcuts; ms < mshortcuts + LEN(mshortcuts); ms++) {
-			if (e->xbutton.button == ms->b
-					&& match(ms->mask, e->xbutton.state)) {
-				ttywrite(ms->s, strlen(ms->s), 1);
-				return;
-			}
-		}
-	}
-
-	for (mk = mkeys; mk < mkeys + LEN(mkeys); mk++) {
-		if (e->xbutton.button == mk->b
-				&& match(mk->mask, e->xbutton.state)) {
-			mk->func(&mk->arg);
+	for (ms = mshortcuts; ms < mshortcuts + LEN(mshortcuts); ms++) {
+		if (e->xbutton.button == ms->b
+				&& match(ms->mask, e->xbutton.state)) {
+			ttywrite(ms->s, strlen(ms->s), 1);
 			return;
 		}
 	}
-
 
 	if (e->xbutton.button == Button1) {
 		/*
@@ -981,20 +971,16 @@ xloadfonts(char *fontstr, double fontsize)
 	win.ch = ceilf(dc.font.height * chscale);
 
 	FcPatternDel(pattern, FC_SLANT);
-	if(!disableitalic)
-		FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
+	FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
 	if (xloadfont(&dc.ifont, pattern))
 		die("can't open font %s\n", fontstr);
 
 	FcPatternDel(pattern, FC_WEIGHT);
-	if(!disablebold)
-		FcPatternAddInteger(pattern, FC_WEIGHT, FC_WEIGHT_BOLD);
 	if (xloadfont(&dc.ibfont, pattern))
 		die("can't open font %s\n", fontstr);
 
 	FcPatternDel(pattern, FC_SLANT);
-	if(!disableroman)
-		FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ROMAN);
+	FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ROMAN);
 	if (xloadfont(&dc.bfont, pattern))
 		die("can't open font %s\n", fontstr);
 
@@ -1734,13 +1720,6 @@ kpress(XEvent *ev)
 		return;
 
 	len = XmbLookupString(xw.xic, e, buf, sizeof buf, &ksym, &status);
-    if ( IS_SET(MODE_KBDSELECT) ) {
-		if ( match(XK_NO_MOD, e->state) ||
-            (XK_Shift_L | XK_Shift_R) & e->state )
-            win.mode ^= trt_kbdselect(ksym, buf, len);
-		return;
-    }
-
 	/* 1. shortcuts */
 	for (bp = shortcuts; bp < shortcuts + LEN(shortcuts); bp++) {
 		if (ksym == bp->keysym && match(bp->mod, e->state)) {
@@ -1923,14 +1902,6 @@ usage(void)
 	    " [-n name] [-o file]\n"
 	    "          [-T title] [-t title] [-w windowid] -l line"
 	    " [stty_args ...]\n", argv0, argv0);
-}
-
-void toggle_winmode(int flag) {
-        win.mode ^= flag;
-}
-
-void keyboard_select(const Arg *dummy) {
-    win.mode ^= trt_kbdselect(-1, NULL, 0);
 }
 
 int
