@@ -2550,11 +2550,11 @@ fibonacci(Monitor *mon, int s) {
 			if(i == 0)
 			{
 				if(n != 1)
-					nw = mon->ww * mon->mfact;
+					nw = (mon->ww * mon->mfact);
 				ny = mon->wy;
 			}
 			else if(i == 1)
-				nw = mon->ww - nw;
+				nw = mon->ww - nw - gappx;
 			i++;
 		}
 		resize(c, nx + gappx, ny + gappx, nw - 2 * c->bw - gappx, nh - 2 * c->bw - gappx, False);
