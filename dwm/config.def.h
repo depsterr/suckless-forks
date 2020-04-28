@@ -47,10 +47,9 @@ static const int resizehints = 0.25;    /* 1 means respect size hints in tiled r
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ ">U>",      centeredfloatingmaster },
+	{ "|O|",      centeredmaster },
 	{ "[T]",      tile },
 	{ "[M]",      monocle },
- 	{ "[O]",      spiral },
- 	{ "[R]",      dwindle },
 	{ NULL,       NULL},
 };
 
@@ -73,9 +72,15 @@ static const char *termcmd[]  = { "st -e tmux", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ GLOBALMODKEY,                       XK_b,      togglebar,      {0} },
+	{ GLOBALMODKEY,                       XK_b,      togglebar,      {} },
+	{ GLOBALMODKEY,                       XK_d,      spawn,          {dmenucmd} },
+	{ GLOBALMODKEY,                       XK_return, spawn,          {termcmd} },
 	{ GLOBALMODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ GLOBALMODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	{ GLOBALMODKEY|ShiftMask,             XK_j,      focusmon,       {.i = +1 } },
+	{ GLOBALMODKEY|ShiftMask,             XK_k,      focusmon,       {.i = -1 } },
+	{ GLOBALMODKEY|ControlMask|ShiftMask, XK_j,      tagmon,         {.i = +1 } },
+	{ GLOBALMODKEY|ControlMask|ShiftMask, XK_k,      tagmon,         {.i = -1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = +1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_d,      incnmaster,     {.i = -1 } },
 	{ GLOBALMODKEY,                       XK_h,      setmfact,       {.f = -0.01} },
@@ -86,10 +91,9 @@ static Key keys[] = {
 	{ GLOBALMODKEY,                       XK_Tab,    view,           {0} },
 	{ GLOBALMODKEY|ShiftMask,             XK_q,      killclient,     {0} },
 	{ GLOBALMODKEY,                       XK_u,      setlayout,      {.v = &layouts[0]} },
-	{ GLOBALMODKEY,                       XK_t,      setlayout,      {.v = &layouts[1]} },
-	{ GLOBALMODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ GLOBALMODKEY,                       XK_o,      setlayout,      {.v = &layouts[3]} },
-	{ GLOBALMODKEY,                       XK_r,      setlayout,      {.v = &layouts[4]} },
+	{ GLOBALMODKEY,                       XK_o,      setlayout,      {.v = &layouts[1]} },
+	{ GLOBALMODKEY,                       XK_t,      setlayout,      {.v = &layouts[2]} },
+	{ GLOBALMODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} },
 	{ GLOBALMODKEY|ControlMask,    		  XK_comma,  cyclelayout,    {.i = -1 } },
 	{ GLOBALMODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
 	{ GLOBALMODKEY|ShiftMask,             XK_space,  togglefloating, {0} },

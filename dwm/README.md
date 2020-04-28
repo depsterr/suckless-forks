@@ -22,7 +22,7 @@
 
 ### unique features
 
-* gaps on ALL layouts (gaps patch only works for the tile layout) and working on outer gaps for all layouts
+* gaps on ALL layouts (gaps patch only works for the tile layout) and working outer gaps for all layouts
 
 * centered master floating has floating middle window even with just one window open
 
