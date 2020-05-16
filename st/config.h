@@ -110,7 +110,7 @@ unsigned int tabspaces = 4;
 
 /* bg opacity */
 
-float alpha = 0.82;
+float alpha = 0.9;
 
 /* Terminal colors (16 first used in escape sequence) */
 
@@ -142,8 +142,8 @@ static const char *colorname[] = {
 
 /* Colors used for selection */
 
-unsigned int selectionbg = 5;
-unsigned int selectionfg = 1;
+unsigned int selectionbg = 8;
+unsigned int selectionfg = 7;
 
 /*
  *
